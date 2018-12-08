@@ -1,0 +1,37 @@
+{
+  "name": "blocipedia",
+  "version": "1.0.0",
+  "description": "Wiki clone",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node api/server.js",
+    "dev": "nodemon api/server.js",
+    "reverse-migrate": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
+    "migrate": "sequelize db:migrate && sequelize db:migrate --env test"
+  },
+  "author": "Josh Gude",
+  "license": "MIT",
+  "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.2.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-flash": "0.0.2",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.3.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "pg": "^7.7.1",
+    "pg-hstore": "^2.3.2",
+    "randomstring": "^1.1.5",
+    "sequelize": "^4.41.2"
+  },
+  "devDependencies": {
+    "jasmine": "^3.3.1",
+    "nodemon": "^1.18.7"
+  }
+}

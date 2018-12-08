@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %> 
+</head>
+<body>
+  <% include ../static/partials/navbar.ejs %> 
+  <main class="container">
+    <% include ../static/partials/messages.ejs %> 
+    <h1>Verify Email Address</h1>
+    <form action="/users/verify" method="post">
+      <div class="form-group">
+        <input type="text" name="validation" class="form-control">
+        <small class="text-muted" id="validationHelp">Paste the validation code that was sent to your email.</small>
+      </div>
+      <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+  </main>
+  <% include ../static/partials/baseScripts.ejs %> 
+</body>
+</html>
