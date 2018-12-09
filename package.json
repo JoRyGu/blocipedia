@@ -8,7 +8,8 @@
     "start": "node api/server.js",
     "dev": "nodemon api/server.js",
     "reverse-migrate": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
-    "migrate": "sequelize db:migrate && sequelize db:migrate --env test"
+    "migrate": "sequelize db:migrate && sequelize db:migrate --env test",
+    "resetdb": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test && sequelize db:migrate && sequelize db:migrate --env test"
   },
   "author": "Josh Gude",
   "license": "MIT",

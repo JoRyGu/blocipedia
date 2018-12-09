@@ -82,7 +82,7 @@ router.get('/sign-in', (req, res) => {
   if(req.user) {
     req.logout();
     req.flash('notice', 'You\'ve successfully signed out!');
-    res.redirect('/users/sign-in');
+    return res.redirect('/users/sign-in');
   }
 
   res.render('users/signIn', { title: 'Sign In', user: req.user})
@@ -94,9 +94,14 @@ router.get('/sign-in', (req, res) => {
 router.post('/sign-in', async (req, res) => {
   const user = await User.findOne({ where: { email: req.body.email } });
 
+  if(!user) {
+    req.flash('error', 'An account for this email does not exist.');
+     return res.redirect('/users/sign-in');
+  }
+
   if(!user.active) {
     req.flash('error', 'You must activate your account before you are able to sign in.');
-    res.redirect('/users/sign-in');
+    return res.redirect('/users/sign-in');
   }
 
   const passwordDoesMatch = await bcrypt.compare(req.body.password, user.password);
