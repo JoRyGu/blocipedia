@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %> 
+  <style>
+    html, body, #editor-container, .container {
+      height: 100%;
+    }
+
+    #prev-container {
+      background-color: #fafafa;
+      padding: 0.7em;
+      border-radius: 0.3em;
+      border: 2px solid #333a40;
+      height: 70%;
+      max-height: 70%;
+      overflow-y: scroll;
+    }
+
+    #editor {
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .editor-form {
+      height: 70%;
+    }
+
+    form {
+      height: 100%;
+    }
+
+    textarea {
+      height: 100%;
+      resize: none;
+      overflow-y: scroll;
+    }
+
+    #editor:hover {
+      
+    }
+
+    .col-md {
+      height: 100%;
+    }
+
+    input {
+      text-align: center;
+    }
+
+    code {
+      background-color: #fff;
+      padding: 0.2em;
+      border-radius: 0.3em;
+      border: 1px solid #ccc;
+    }
+
+    img {
+      max-width: 35%;
+    }
+  </style>
+</head>
+<body>
+  <% include ../static/partials/navbar.ejs %> 
+  
+  <main class="container">
+    <h1 style="text-align:center;">Create New Wiki</h1>
+    <% include ../static/partials/messages.ejs %>
+    <div class="row">
+      <div class="form-control">
+        <input type="text" id="title-input" class="form-control" placeholder="Enter Your Title">
+      </div>
+    </div>
+    <div class="row" id="editor-container">
+      <div class="col-md">
+        <h4 style="text-align:center;">Edit</h4>
+        <form action="/wikis/create" method="post" id="form">
+          <div class="form-group editor-form">
+            <textarea name="body" class="form-control" id="editor" placeholder="###### Use Markdown Syntax!" onscroll="SyncScroll('editor')"></textarea>
+            <input type="text" style="display:none;" id="hidden-form" name="title">
+          </div>
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+      <div class="col-md">
+        <h4 style="text-align:center;">Preview</h4>
+        <div id="prev-container" onscroll="SyncScroll('prev-container')">
+          <div id="preview"> 
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+    preview.innerHTML = '<h6>Use Markdown Syntax!</h4>';
+    editor.addEventListener('input', () => {
+      preview.innerHTML = marked(editor.value, {
+        highlight: function(code) {
+          return hljs.highlightAuto(code).value;
+        },
+        gfm: true,
+        sanitize: true,
+        tables: true,
+        smartypants: true
+      });
+    });
+
+    function SyncScroll(divID) {
+      const edit = document.getElementById("editor");
+      const prev = document.getElementById("prev-container");
+      if (divID =="editor") {
+        prev.scrollTop = edit.scrollTop;
+      }
+      else {
+        edit.scrollTop = prev.scrollTop;
+      }
+    }
+  </script>
+
+  <script>
+    const visibleTitle = document.getElementById('title-input');
+    const hiddenTitle = document.getElementById('hidden-form');
+    const form = document.getElementById('form');
+    visibleTitle.addEventListener('input', (event) => {
+      event.preventDefault();
+      hiddenTitle.value = visibleTitle.value;
+    });
+  </script>
+  <% include ../static/partials/baseScripts.ejs %> 
+</body>
+</html>

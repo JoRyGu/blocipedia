@@ -7,9 +7,13 @@ const sendMail = require('./sendgrid');
 // Init models
 const User = require('../../db/models').User;
 const Verification = require('../../db/models').Verification;
+const Wiki = require('../../db/models').Wiki;
 
 // Import validation file
 const validation = require('../../validation/validation');
+
+// Import auth file
+const auth = require('../../auth/helpers').ensureAuthenticated;
 
 // @route   GET /users/sign-up
 // @desc    Testing view config
@@ -46,6 +50,8 @@ router.post('/sign-up', async (req, res) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
     role: req.body.role
   };
 
@@ -56,18 +62,12 @@ router.post('/sign-up', async (req, res) => {
       req.flash('error', 'A user has already been created for that email.');
       res.redirect('/users/sign-up');
     } else {
-      const password = await hashPassword(newUser.password)
-      const user = await User.create({
-        email: newUser.email,
-        password: password,
-        role: req.body.role
-      });
+      newUser.password = await hashPassword(newUser.password)
+      const user = await User.create(newUser);
 
       await sendMail(user);
       req.flash('notice', `Verification email sent to ${user.email}.`);
       res.redirect('/users/sign-in');
-      /////////<<<<<<<<<--------------- Here is where verification email should go.
-    
     }
   } catch(errors) {
     console.log(errors);
@@ -113,7 +113,7 @@ router.post('/sign-in', async (req, res) => {
         res.redirect('/users/sign-in');
       } else {
         req.flash('notice', 'You\'ve successfully signed in!');
-        res.redirect('/users/sign-up');                 /////////////<-------- change this
+        res.redirect(`/users/${req.user.id}/profile`);
       }
     });
   } else {
@@ -143,12 +143,29 @@ router.post('/verify', async (req, res) => {
 
   const user = await User.findOne({ where: { id: verification.user_id } });
 
+  if(!user) {
+    return req.flash('error', '404: Bad Request');
+  }
+
   await user.update({ active: true });
   await verification.destroy();
 
   req.flash('notice', 'Your account was activated successfully! You may now sign in to your account.');
   res.redirect('/users/sign-in');
 });
+
+// @route   GET /users/:id/profile
+// @desc    Render user's profile page
+// @access  Private
+router.get('/:id/profile', auth, async (req, res) => {
+  if(req.user.id !== parseInt(req.params.id)) {
+    req.flash('error', 'You are not authorized to view that profile.');
+    return res.redirect('/');
+  }
+  const wikis = await Wiki.findAll({ where: { userId: req.user.id } });
+
+  res.render('users/profile', { title: 'Profile', user: req.user, wikis: wikis });
+})
 
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt();

@@ -5,7 +5,7 @@ const passport = require('passport');
 const path = require('path');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('../db/models').User;
-const authorize = require('../authorization/helpers');
+const authorize = require('../auth/helpers');
 const session = require('express-session');
 const flash = require('express-flash');
 const expressValidator = require('express-validator');
@@ -66,10 +66,12 @@ passport.deserializeUser((id, callback) => {
 // Import routes
 const users = require('../api/routes/users');
 const static = require('../api/routes/static');
+const wikis = require('../api/routes/wikis');
 
 // Init routes
 app.use('/users', users);
-// app.use('/', static);
+app.use('/', static);
+app.use('/wikis', wikis);
 
 // Set port
 const port = process.env.PORT || 5000;

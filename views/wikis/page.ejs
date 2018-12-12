@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %> 
+  <style>
+    #title {
+      border-bottom: 1px solid #333a40;
+      margin: 2% 0;
+    }
+
+    code {
+      background-color: #eee;
+      padding: 0.2em;
+      border-radius: 0.3em;
+      border: 1px solid #ccc;
+    }
+
+    .main-body {
+      border-bottom: 1px solid #333a40;
+    }
+
+    .updated {
+      font-size: 12px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <% include ../static/partials/navbar.ejs %> 
+  <main class="container">
+    <% include ../static/partials/messages.ejs %>
+    <h1 id="title"><%= title %> </h1>
+    <textarea name="text" id="text" cols="30" rows="10" style="display:none;"><%= wiki.body %> </textarea>
+    <div class="main-body">
+
+    </div>
+    <% if (wiki.updated) { %>
+      <p class="updated">Last updated by <%= updater.firstname %>, <%= wiki.updatedAt %></p>
+    <% } %>
+  </main>
+
+  <% include ../static/partials/baseScripts.ejs %> 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+  <script>
+    const main = document.querySelector('.main-body');
+    const text = document.getElementById('text');
+
+    document.addEventListener('DOMContentLoaded', () => parseHtml(main));
+
+    function parseHtml(body) {
+      body.innerHTML = marked(text.value, {
+          highlight: function(code) {
+            return hljs.highlightAuto(code).value;
+          },
+          gfm: true,
+          sanitize: true,
+          tables: true,
+          smartypants: true
+        });
+    }
+  </script>
+</body>
+</html>

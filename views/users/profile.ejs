@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %>
+  <style>
+
+    body {
+      padding-top: 60px;
+    }
+
+    div button {
+      margin: 10px 10px 0 10px;
+      font-family: sans-serif;
+      font-size: 0.8em;
+      border-radius: 0.7em;
+      color: white;
+      border: 1px solid black;
+    }
+
+    #confirm {
+      background-color: #21a84f;
+    }
+
+    #cancel {
+      background-color: red;
+    }
+
+    #confirm:hover, #cancel:hover {
+      cursor: pointer;
+    }
+
+    form button {
+      padding: 0;
+      margin: 0;
+      background: none;
+      border-radius: 0;
+      border: 0;
+    }
+
+    .wikis {
+      list-style: none;
+      padding: 0.3em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      color: #777;
+      font-family: sans-serif;
+    }
+
+    .controls * {
+      padding: 0 6px;
+      font-size: 0.8em;
+      color: #777;
+    }
+
+    .controls *:hover {
+      color: #000;
+      cursor: pointer;
+      border-radius: 2em;
+    }
+
+    #edit:hover {
+      background-color: yellow;
+      border: 1px solid #000;
+    }
+
+    #delete:hover {
+      background-color: red;
+      color: white;
+      border: 1px solid #000;
+    }
+
+    .wikiUL {
+      width: 400px;
+      padding: 0px;
+      border-radius: 0.2em;
+      border: 2px solid #333a40;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a, a:active, a:visited {
+      text-decoration: none;
+      color: black;
+    }
+
+    p {
+      margin: 0px;
+    }
+
+    a:hover {
+      text-decoration: none;
+      color: black;
+      font-weight: bold;
+    }
+
+    #content {
+      flex-direction: column;
+    }
+
+    .delete-warning {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -62.5px;
+      margin-left: -187.5px;
+      flex-direction: column;
+      background: #cccccc;
+      height: 125px;
+      width: 375px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.3em;
+      border: 2px solid #333a40;
+      z-index: 1032;
+      transition: visibility 0s, opacity 3s, linear;
+    }
+
+    .overlay {
+      display: none;
+      padding: 0;
+      z-index: 1031;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      position: absolute;
+    }
+  </style>
+</head>
+<div class="overlay"></div>
+<body>
+  
+  <% include ../static/partials/navbar.ejs %> 
+  <main class="container">
+  <% include ../static/partials/messages.ejs %>
+    <h2 style="text-align:center;">Profile</h2>
+    <div class="col">
+      <div class="row align-items-center" id="content" >
+        
+        <h5 class="wikilist">Your Wikis</h5>
+          <% if (wikis.length <= 0) { %>
+            <p>You have not created any wikis.</p>
+          <% } else { %>
+            <ul class="wikiUL">
+              <% wikis.forEach((wiki, index) => { %>
+                <% let background = index % 2 === 0 ? '#CCC' : '#FFF' %> 
+                <li class = "wikis" style="background-color:<%= background %>;">
+                  <a href="/wikis/<%= wiki.id %>"><%= wiki.title %> </a>
+                  <div class="controls">
+                    <form action="/wikis/<%= wiki.id %>/update" method="get">
+                      <button type="submit" id="edit">Edit</button>
+                    </form>
+                    <form action="/wikis/<%= wiki.id %>/delete" method="post">
+                      <button type="submit" id="delete">Delete</button>
+                    </form>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+      </div>
+      <div class="row justify-content-center">
+        <a href="/wikis/create">
+          <button class="btn btn-success">Create New Wiki</button>
+        </a>
+      </div>
+    </div>
+  </main>
+  <% include ../static/partials/baseScripts.ejs %> 
+</body>
+</html>

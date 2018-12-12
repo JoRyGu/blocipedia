@@ -21,12 +21,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    firstname: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastname: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
   }, {});
   User.associate = function(models) {
     // associations can be defined here
     User.hasOne(models.Verification, {
       foreignKey: 'user_id'
+    });
+
+    User.hasMany(models.Wiki, {
+      foreignKey: 'userId',
+      as: 'wikis'
     });
   };
 

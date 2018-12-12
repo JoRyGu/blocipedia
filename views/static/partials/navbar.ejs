@@ -15,7 +15,7 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <% if (user) { %>
-            <a href="#" class="nav-link">Profile</a>
+            <a href="/users/<%= user.id %>/profile" class="nav-link"><%= user.firstname + ' ' + user.lastname %> </a>
           <% } else { %>
             <a href="/users/sign-up" class="nav-link">Sign Up</a>
           <% } %>
