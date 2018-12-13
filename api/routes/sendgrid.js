@@ -21,7 +21,7 @@ module.exports = async function(user) {
         <h1 style="font-size:5em; font-weight:bold;">Welcome to Blocipedia!</h1>
         <p>To access your account, please enter the code below at the following link.</p>
         <h2 style="font-weight:bold;">${verification.hash}</h2>
-        <a href="http://localhost:5000/users/verify" style="box-sizing:border-box;border-color:#348eda;font-weight:400;text-decoration:none;display:inline-block;margin:0;color:#ffffff;background-color:#348eda;border:solid 1px #348eda;border-radius:2px;font-size:14px;padding:12px 45px">
+        <a href="https://blocipedia-jorygu.herokuapp.com/users/verify" style="box-sizing:border-box;border-color:#348eda;font-weight:400;text-decoration:none;display:inline-block;margin:0;color:#ffffff;background-color:#348eda;border:solid 1px #348eda;border-radius:2px;font-size:14px;padding:12px 45px">
           Click to Verify
         </a>
       </body>
