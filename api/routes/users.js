@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const sendMail = require('./sendgrid');
+const userQuery = require('../../db/queries/users');
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 
 // Init models
 const User = require('../../db/models').User;
@@ -10,7 +12,7 @@ const Verification = require('../../db/models').Verification;
 const Wiki = require('../../db/models').Wiki;
 
 // Import validation file
-const validation = require('../../validation/validation');
+const userValidation = require('../../validation/user');
 
 // Import auth file
 const auth = require('../../auth/helpers').ensureAuthenticated;
@@ -26,23 +28,13 @@ router.get('/sign-up', (req, res) => {
 // @desc    create a new user and log them in
 // @access  Public
 router.post('/sign-up', async (req, res) => {
-  if(!validation.isValidEmail(req.body.email)) {
-    req.flash('error', 'Invalid email.');
-    return res.redirect('/users/sign-up');
-  }
+  const errors = userValidation(req.body.firstname, req.body.lastname, req.body.email, req.body.password, req.body.confirmPassword);
+  const errorsArray = Object.keys(errors).map(key => {
+    return errors[key];
+  })
 
-  if(!validation.isValidPassword(req.body.password)) {
-    req.flash('error', 'Invalid password.');
-    return res.redirect('/users/sign-up');
-  }
-
-  if(!validation.passwordsMatch(req.body.password, req.body.confirmPassword)) {
-    req.flash('error', 'Passwords do not match.');
-    return res.redirect('/users/sign-up');
-  }
-
-  if(!validation.signUpFieldsNotBlank(req.body.email) || !validation.signUpFieldsNotBlank(req.body.password)) {
-    req.flash('error', 'All fields are required');
+  if(!errors && !errors.length) {
+    req.flash('error', errorsArray);
     return res.redirect('/users/sign-up');
   }
 
@@ -55,24 +47,40 @@ router.post('/sign-up', async (req, res) => {
     role: req.body.role
   };
 
-  try{
-    const userExists = await User.findOne({ where: { email: newUser.email } });
+  const checkUser = await User.findOne({ where: { email: newUser.email } });
 
-    if(userExists) {
-      req.flash('error', 'A user has already been created for that email.');
-      res.redirect('/users/sign-up');
+  if(checkUser) {
+    req.flash('error', 'User already exists for that email.');
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(newUser.password, salt);
+
+  const user = await User.create({
+    email: newUser.email,
+    password: hash,
+    firstname: newUser.firstname,
+    lastname: newUser.lastname
+  });
+
+  passport.authenticate('local')(req, res, () => {
+    if(!req.user) {
+      req.flash('error', 'There was an error signing you in.');
+      return res.redirect('/users/sign-in');
     } else {
-      newUser.password = await hashPassword(newUser.password)
-      const user = await User.create(newUser);
-
-      await sendMail(user);
-      req.flash('notice', `Verification email sent to ${user.email}.`);
-      res.redirect('/users/sign-in');
+      req.flash('notice', 'You were successfully signed in.');
+      if(req.body.role === 'premium') {
+        return res.redirect('/users/premium');
+      }
+    
+      sendMail(user)
+      .then(() => {
+        req.flash('notice', 'Verification email sent to ' + user.email);
+        res.redirect('/users/verify');
+      })
     }
-  } catch(errors) {
-    console.log(errors);
-    res.redirect('/users/sign-up');
-  }  
+  })
+    
 });
 
 // @route   GET /users/sign-in
@@ -97,11 +105,6 @@ router.post('/sign-in', async (req, res) => {
   if(!user) {
     req.flash('error', 'An account for this email does not exist.');
      return res.redirect('/users/sign-in');
-  }
-
-  if(!user.active) {
-    req.flash('error', 'You must activate your account before you are able to sign in.');
-    return res.redirect('/users/sign-in');
   }
 
   const passwordDoesMatch = await bcrypt.compare(req.body.password, user.password);
@@ -165,11 +168,82 @@ router.get('/:id/profile', auth, async (req, res) => {
   const wikis = await Wiki.findAll({ where: { userId: req.user.id } });
 
   res.render('users/profile', { title: 'Profile', user: req.user, wikis: wikis });
-})
+});
 
-async function hashPassword(password) {
-  const salt = await bcrypt.genSalt();
-  return await bcrypt.hash(password, salt);
-}
+// @route   GET /users/premium
+// @desc    Render premium payment page
+// @access  Private
+router.get('/premium', auth, async (req, res) => {
+  res.render('users/premium', { title: 'Upgrade Account', user: req.user });
+});
+
+// @route   POST /users/premium
+// @desc    Send information to the server setting premium status for user
+// @access  Private
+router.post('/premium', auth, async (req, res) => {
+  const token = req.body.stripeToken;
+
+  stripe.charges.create({
+    amount: 1000,
+    currency: 'usd',
+    description: 'Premium Membership',
+    source: token
+  })
+  .then(charge => {
+    if(charge) {
+      User.findByPk(req.user.id)
+      .then(user => {
+        if(user) {
+          user.update({
+            role: 'premium'
+          })
+          .then(user => {
+            sendMail(user)
+            .then(() => {
+              req.flash('notice', 'Congratulations! You\'ve been upgraded to a premium account. Check your email for a verification code!');
+              res.redirect(`/users/${req.user.id}/profile`);
+            })
+          });
+        } else {
+          req.flash('error', 'There was an error finding your account.');
+          return res.redirect('/users/premium');
+        }
+      });
+    } else {
+      req.flash('error', 'There was an error processing your payment.');
+      return res.redirect('/users/premium');
+    }
+  })
+  .catch(err => {
+    req.flash('error', err);
+    return res.redirect('/users/premium');
+  });
+});
+
+// @route   GET /users/downgrade
+// @desc    Render user downgrade page
+// @access  Private
+router.get('/downgrade', auth, async (req, res) => {
+  res.render('users/downgrade', { title: 'Downgrade Account', user: req.user });
+});
+
+// @route   POST /users/downgrade
+// @desc    Update user to member status
+// @access  Private
+router.post('/downgrade', auth, async (req, res) => {
+  const user = await User.findByPk(req.user.id);
+
+  if(!user) {
+    req.flash('error', 'There was an error when downgrading your account. Please email support.');
+    return res.redirect('/users/sign-in');
+  }
+
+  await user.update({
+    role: 'member'
+  });
+
+  req.flash('notice', 'You have successfully downgraded your account.');
+  res.redirect(`/users/${req.user.id}/profile`);
+});
 
 module.exports = router;

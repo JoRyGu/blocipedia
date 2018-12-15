@@ -9,7 +9,8 @@
     "dev": "nodemon api/server.js",
     "reverse-migrate": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
     "migrate": "sequelize db:migrate && sequelize db:migrate --env test",
-    "resetdb": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test && sequelize db:migrate && sequelize db:migrate --env test"
+    "resetdb": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test && sequelize db:migrate && sequelize db:migrate --env test",
+    "db": "psql blocipedia-dev"
   },
   "author": "Josh Gude",
   "license": "MIT",
@@ -32,7 +33,8 @@
     "randomstring": "^1.1.5",
     "sequelize": "^4.41.2",
     "sequelize-cli": "^5.4.0",
-    "showdown": "^1.9.0"
+    "showdown": "^1.9.0",
+    "stripe": "^6.19.0"
   },
   "devDependencies": {
     "jasmine": "^3.3.1",

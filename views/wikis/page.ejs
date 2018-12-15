@@ -24,12 +24,20 @@
       text-align: right;
     }
   </style>
+  <link rel="stylesheet" href="/views/assets/users.css" type="text/css">
 </head>
 <body>
   <% include ../static/partials/navbar.ejs %> 
   <main class="container">
     <% include ../static/partials/messages.ejs %>
-    <h1 id="title"><%= title %> </h1>
+    <div class="title flex-space-between">
+      <h1><%= title %> </h1>
+      <% if (user) { %>
+        <a href="/wikis/<%= wiki.id %>/update">
+          <button class="btn btn-warning">Edit Wiki</button>
+        </a>
+      <% } %>
+    </div>
     <textarea name="text" id="text" cols="30" rows="10" style="display:none;"><%= wiki.body %> </textarea>
     <div class="main-body">
 

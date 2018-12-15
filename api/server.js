@@ -30,9 +30,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Init views path and engine
-console.log(path.join(__dirname, '..', 'views'));
 app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'ejs');
+app.use('/views', express.static('views'));
 
 // Init passport
 app.use(passport.initialize());
@@ -52,7 +52,7 @@ passport.serializeUser((user, callback) => {
   callback(null, user.id);
 });
 passport.deserializeUser((id, callback) => {
-  User.findById(id)
+  User.findByPk(id)
   .then(user => {
     callback(null, user);
   })
@@ -75,7 +75,6 @@ app.use('/wikis', wikis);
 
 // Set port
 const port = process.env.PORT || 5000;
-const sgMail = require('@sendgrid/mail');
 
 // App listen
 app.listen(port, () => console.log(`Server listening on port ${port}.`));

@@ -5,9 +5,9 @@
     </button>
     <% if (messages.error) { %>
     <ul>
-      <% messages.error.forEach(err => { %>
+      <% messages.error.forEach((err, i) => { %>
        <li>
-        <%= `${messages.error}` %> 
+        <%= `${messages.error[i]}` %> 
        </li>
       <% }) %>
     </ul>

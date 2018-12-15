@@ -1,0 +1,28 @@
+.title {
+  border-bottom: 1px solid #333a40;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.larger-text {
+  font-size: 1.3em;
+  padding-top: 0.7em;
+}
+
+.extra-margins {
+  margin: 2.3em;
+}
+
+.profile-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

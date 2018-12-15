@@ -15,6 +15,10 @@ router.get('/', async (req, res) => {
 // @desc    Get wiki creation page
 // @access  Private
 router.get('/create', authentication, async (req, res) => {
+  if(!req.user.active) {
+    req.flash('error', 'You must verify your account before you can create wikis.');
+    return res.redirect('/users/verify');
+  }
   res.render('wikis/create', { title: 'Create New Wiki', user: req.user });
 });
 
@@ -28,6 +32,11 @@ router.post('/create', authentication, async (req, res) => {
   // [] code to handle both private and public wikis
   // [x] change vanilla textarea to a markdown editor
   // [x] implement a side by side editor/preview window
+
+  if(!req.user.active) {
+    req.flash('error', 'You must verify your account before creating wikis.');
+    return res.redirect('/users/verify');
+  }
 
   if(!req.body.title) {
     console.log(req.body.title);
@@ -61,8 +70,8 @@ router.post('/create', authentication, async (req, res) => {
 // @desc    Get wiki page
 // @access  Public/Private
 router.get('/:wikiId', async (req, res) => {
-  const wiki = await Wiki.findById(req.params.wikiId);
-  const updater = await User.findById(wiki.updaterId);
+  const wiki = await Wiki.findByPk(req.params.wikiId);
+  const updater = await User.findByPk(wiki.updaterId);
 
   if(wiki.private) {
     // Build in logic here
@@ -75,7 +84,7 @@ router.get('/:wikiId', async (req, res) => {
 // @desc    Get wiki editor page
 // @access  Private
 router.get('/:wikiId/update', authentication, async (req, res) => {
-  const wiki = await Wiki.findById(req.params.wikiId);
+  const wiki = await Wiki.findByPk(req.params.wikiId);
   res.render('wikis/update', { wiki, title: 'Update Wiki', user: req.user });
 });
 
@@ -98,7 +107,7 @@ router.post('/:wikiId/update', authentication, async (req, res) => {
     return res.redirect('/wikis/create');
   }
 
-  const wiki = await Wiki.findById(req.params.wikiId);
+  const wiki = await Wiki.findByPk(req.params.wikiId);
 
   if(!wiki) {
     req.flash('error', 'No wiki found under that ID.');
@@ -112,7 +121,7 @@ router.post('/:wikiId/update', authentication, async (req, res) => {
     updaterId: req.user.id
   });
 
-  const user = await User.findById(req.user.id);
+  const user = await User.findByPk(req.user.id);
 
   res.redirect(`/wikis/${req.params.wikiId}`);
 });
@@ -121,7 +130,7 @@ router.post('/:wikiId/update', authentication, async (req, res) => {
 // @desc    Delete wiki
 // @access  Private
 router.post('/:wikiId/delete', authentication, async (req, res) => {
-  const wiki = await Wiki.findById(req.params.wikiId);
+  const wiki = await Wiki.findByPk(req.params.wikiId);
 
   if(!wiki) {
     req.flash('error', 'No wiki found with that ID.');

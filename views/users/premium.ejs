@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %>
+  <link rel="stylesheet" href="/views/assets/users.css" type="text/css">
+</head>
+<body>
+  <% include ../static/partials/navbar.ejs %> 
+  <main class="container">
+    <% include ../static/partials/messages.ejs %> 
+    <h1 class="title">Upgrade to Premium</h1>
+    <p class="larger-text">Blocipedia is a 501(c)(3) certified non-profit organization aimed at bringing a crowd-sourced encyclopedia to anyone and everyone, free of charge.
+       Contributing to Blocipedia with a premium account will assist us with funding for hosting and moderating services into the foreseeable future. But that's not all.
+       Maintaining a premium account on Blocipedia will open access to all of the following features for you:
+    </p>
+    <ul class="larger-text">
+      <li>Unlimited access to private wiki pages</li>
+      <li>The ability to add and remove collaborators to your private pages.</li>
+    </ul>
+    <p class="larger-text">
+      We at Blocipedia can't thank you enough for helping us maintain this project!
+    </p>
+    <form action="/users/premium" method="POST" class="center extra-margins">
+      <script
+        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+        data-key="pk_test_2gSUpoTSAIfw8zgIXfbxjNZI"
+        data-amount="1000"
+        data-name="Blocipedia"
+        data-description="Premium Membership"
+        data-image="http://gplusnick.com/wp-content/uploads/2017/11/the-letter-b-in-black-times-new-roman-serif-font-typeface-with-the-letter-b-768x768.jpg"
+        data-locale="auto"
+        data-zip-code="true">
+      </script>
+    </form>
+    
+  </main>
+
+  <% include ../static/partials/baseScripts.ejs %> 
+</body>
+</html>

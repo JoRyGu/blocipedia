@@ -131,6 +131,7 @@
       position: absolute;
     }
   </style>
+  <link rel="stylesheet" href="/views/assets/users.css" type="text/css">
 </head>
 <div class="overlay"></div>
 <body>
@@ -138,7 +139,7 @@
   <% include ../static/partials/navbar.ejs %> 
   <main class="container">
   <% include ../static/partials/messages.ejs %>
-    <h2 style="text-align:center;">Profile</h2>
+    <h1 class="title">Profile</h1>
     <div class="col">
       <div class="row align-items-center" id="content" >
         
@@ -165,9 +166,25 @@
           <% } %>
       </div>
       <div class="row justify-content-center">
-        <a href="/wikis/create">
-          <button class="btn btn-success">Create New Wiki</button>
-        </a>
+        <% if (user.active) { %>
+            <a href="/wikis/create">
+              <button class="btn btn-success">Create New Wiki</button>
+            </a>
+        <% } else { %>
+            <a href="/users/verify">
+              <button class="btn btn-success">Verify Account To Create Wikis</button>
+            </a>
+        <% } %>
+        <% if (user.role === 'member') { %>
+          <a href="/users/premium">
+            <button class="btn btn-success">Upgrade Account</button>
+          </a>
+        <% } %>
+        <% if (user.role === 'premium') { %>
+          <a href="/users/downgrade">
+            <button class="btn btn-danger">Downgrade Account</button>
+          </a>
+        <% } %>
       </div>
     </div>
   </main>

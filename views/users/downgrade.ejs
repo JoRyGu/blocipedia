@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include ../static/partials/head.ejs %>
+  <link rel="stylesheet" href="/views/assets/users.css" type="text/css">
+</head>
+<body>
+  <% include ../static/partials/navbar.ejs %> 
+  <main class="container">
+    <% include ../static/partials/messages.ejs %> 
+    <h1 class="title">Downgrade Account</h1>
+    <p><strong>WARNING</strong>: Downgrading your account will restrict your access to your own private wikis as well as private wikis that you contribute to.</p>
+    <div class="profile-buttons">
+      <form action="/users/downgrade" method="post">
+        <button type="submit" class="btn btn-danger">Downgrade Account</button>
+      </form>      
+    </div>
+  </main>
+  <% include ../static/partials/baseScripts.ejs %> 
+</body>
+</html>
