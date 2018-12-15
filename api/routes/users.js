@@ -216,6 +216,7 @@ router.post('/premium', auth, async (req, res) => {
   })
   .catch(err => {
     req.flash('error', err);
+    console.log(err);
     return res.redirect('/users/premium');
   });
 });
