@@ -9,6 +9,7 @@ const authorize = require('../auth/helpers');
 const session = require('express-session');
 const flash = require('express-flash');
 const expressValidator = require('express-validator');
+const favicon = require('serve-favicon');
 
 // Init app
 const app = express();
@@ -72,6 +73,10 @@ const wikis = require('../api/routes/wikis');
 app.use('/users', users);
 app.use('/', static);
 app.use('/wikis', wikis);
+app.use(favicon(path.join(__dirname, '..', 'favicon.ico')))
+app.use(function(req, res, next) {
+  res.status(404).sendFile('404.html', { root: path.join(__dirname, '..', 'views/assets') });
+})
 
 // Set port
 const port = process.env.PORT || 5000;

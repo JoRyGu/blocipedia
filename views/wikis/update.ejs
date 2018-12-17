@@ -75,7 +75,11 @@
             <textarea name="body" class="form-control" id="editor" onscroll="SyncScroll('editor')"><%= wiki.body %></textarea>
             <input type="text" style="display:none;" id="hidden-form" name="title">
           </div>
-          <button type="submit" class="btn btn-success">Update</button>
+          <button type="submit" class="btn btn-success right-margin-form btn-font">Update</button>
+            <% if (user.role === 'premium') { %>
+              <input type="checkbox" class="right-margin-form-sm" value="private" id="private" form="form" name="private">
+              <label for="private" class="no-margin btn-font">Make this wiki private</label>
+            <% } %>
         </form>
       </div>
       <div class="col-md">

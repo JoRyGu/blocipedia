@@ -159,6 +159,19 @@
                     <form action="/wikis/<%= wiki.id %>/delete" method="post">
                       <button type="submit" id="delete">Delete</button>
                     </form>
+                    <% if (user.role === 'premium') { %>
+                      <% if (wiki.private) { %>
+                        <form action="/wikis/<%= wiki.id %>/update" method="post">
+                          <input type="text" name="privateUpdate" value="false" style="display:none;">
+                          <button type="submit" id="make-public">Make Public&nbsp;</button>
+                        </form>
+                      <% } else { %>
+                        <form action="/wikis/<%= wiki.id %>/update" method="post">
+                          <input type="text" name="privateUpdate" value="true" style="display:none;">
+                          <button type="submit" id="make-private">Make Private</button>
+                        </form>
+                      <% } %>
+                    <% } %>
                   </div>
                 </li>
               <% }) %>

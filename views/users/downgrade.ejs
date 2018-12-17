@@ -9,10 +9,11 @@
   <main class="container">
     <% include ../static/partials/messages.ejs %> 
     <h1 class="title">Downgrade Account</h1>
-    <p><strong>WARNING</strong>: Downgrading your account will restrict your access to your own private wikis as well as private wikis that you contribute to.</p>
+    <p><strong>WARNING</strong>: Downgrading your account will cause all of your private wikis to go public. It will also restrict your access to private wikis that you contribute to.</p>
+    <p>Please make sure that you remove any private wikis with sensitive information before downgrading your account.</p>
     <div class="profile-buttons">
       <form action="/users/downgrade" method="post">
-        <button type="submit" class="btn btn-danger">Downgrade Account</button>
+        <button type="submit" class="btn btn-danger btn-font">Downgrade Account</button>
       </form>      
     </div>
   </main>

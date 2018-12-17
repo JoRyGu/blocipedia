@@ -243,6 +243,19 @@ router.post('/downgrade', auth, async (req, res) => {
     role: 'member'
   });
 
+  const privateWikis = await Wiki.findAll({
+    where: {
+      userId: user.id,
+      private: true
+    }
+  });
+
+  for(let i = 0; i < privateWikis.length; i++) {
+    await privateWikis[i].update({
+      private: false
+    });
+  }
+
   req.flash('notice', 'You have successfully downgraded your account.');
   res.redirect(`/users/${req.user.id}/profile`);
 });

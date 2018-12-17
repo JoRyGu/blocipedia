@@ -8,7 +8,38 @@ const User = require('../../db/models').User;
 // @desc    Render list of public wikis
 // @access  Public
 router.get('/', async (req, res) => {
-  res.render('wikis/view', { title: 'Public Wikis', user: req.user });
+  const publicWikis = await Wiki.findAll({
+    where: {
+      private: false
+    }
+  });
+
+  let privateWikis;
+
+  if(req.user) {
+    privateWikis = await Wiki.findAll({
+      where: {
+        userId: req.user.id,
+        private: true
+      }
+    });
+  }
+
+  const wikis = [];
+
+  if(publicWikis) {
+    for(let i = 0; i < publicWikis.length; i++) {
+      wikis.push(publicWikis[i]);
+    }
+  }
+  
+  if(privateWikis) {
+    for(let i = 0; i < privateWikis.length; i++) {
+      wikis.push(privateWikis[i]);
+    }
+  }
+  
+  res.render('wikis/view', { title: 'Public Wikis', user: req.user, wikis });
 })
 
 // @route   GET /wikis/create
@@ -26,13 +57,6 @@ router.get('/create', authentication, async (req, res) => {
 // @desc    Post new wiki to server
 // @access  Private
 router.post('/create', authentication, async (req, res) => {
-  /* -------------------- THIS ROUTE IS UNDER DEVELOPMENT -------------------------*/
-  /* --- NEEDS --- */
-  // [x] authentication - only users are able to create and edit wikis
-  // [] code to handle both private and public wikis
-  // [x] change vanilla textarea to a markdown editor
-  // [x] implement a side by side editor/preview window
-
   if(!req.user.active) {
     req.flash('error', 'You must verify your account before creating wikis.');
     return res.redirect('/users/verify');
@@ -57,7 +81,7 @@ router.post('/create', authentication, async (req, res) => {
   const newWiki = {
     title: req.body.title,
     body: req.body.body,
-    private: false, // <<<-------------- adjust this when implementing private wikis
+    private: req.body.private === 'private' && req.user.role === 'premium' ? true : false,
     userId: req.user.id
   };
 
@@ -74,7 +98,10 @@ router.get('/:wikiId', async (req, res) => {
   const updater = await User.findByPk(wiki.updaterId);
 
   if(wiki.private) {
-    // Build in logic here
+    if((!req.user) || (req.user.id !== wiki.userId)) {
+      req.flash('error', 'This is a private wiki page.');
+      return res.redirect('/wikis');
+    }
   }
 
   res.render('wikis/page', { title: `${wiki.title}`, user: req.user, wiki, updater });
@@ -92,38 +119,46 @@ router.get('/:wikiId/update', authentication, async (req, res) => {
 // @desc    Update a wiki
 // @access  Private
 router.post('/:wikiId/update', authentication, async (req, res) => {
-  if(!req.body.title) {
-    req.flash('error', 'You must enter a title for this Wiki.');
-    return res.redirect('/wikis/create');
-  }
-
-  if(!req.body.body) {
-    req.flash('error', 'You cannot submit an empty Wiki.');
-    return res.redirect('/wikis/create');
-  }
-
-  if(req.body.title.length < 3 || req.body.title.length > 30) {
-    req.flash('error', 'Your title must be between 3 and 30 characters.');
-    return res.redirect('/wikis/create');
-  }
-
   const wiki = await Wiki.findByPk(req.params.wikiId);
 
-  if(!wiki) {
-    req.flash('error', 'No wiki found under that ID.');
-    return res.redirect(`/users/${req.params.id}/profile`);
+  if(req.body.privateUpdate) {
+    await wiki.update({
+      private: req.body.privateUpdate
+    });
+    return res.redirect(`/users/${req.user.id}/profile`)
+  } else {
+    if(!req.body.title) {
+      req.flash('error', 'You must enter a title for this Wiki.');
+      return res.redirect('/wikis/create');
+    }
+  
+    if(!req.body.body) {
+      req.flash('error', 'You cannot submit an empty Wiki.');
+      return res.redirect('/wikis/create');
+    }
+  
+    if(req.body.title.length < 3 || req.body.title.length > 30) {
+      req.flash('error', 'Your title must be between 3 and 30 characters.');
+      return res.redirect('/wikis/create');
+    }
+  
+    if(!wiki) {
+      req.flash('error', 'No wiki found under that ID.');
+      return res.redirect(`/users/${req.params.id}/profile`);
+    }
+  
+    await wiki.update({
+      title: req.body.title,
+      body: req.body.body,
+      updated: true,
+      updaterId: req.user.id,
+      private: req.body.private === 'private' && req.user.role === 'premium' && wiki.userId === req.user.id ? true : false
+    });
+  
+    const user = await User.findByPk(req.user.id);
+  
+    res.redirect(`/wikis/${req.params.wikiId}`);
   }
-
-  await wiki.update({
-    title: req.body.title,
-    body: req.body.body,
-    updated: true,
-    updaterId: req.user.id
-  });
-
-  const user = await User.findByPk(req.user.id);
-
-  res.redirect(`/wikis/${req.params.wikiId}`);
 });
 
 // @route   post /wikis/:wikiId/delete

@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <% include ../static/partials/head.ejs %> 
+  <% include ../static/partials/head.ejs %>
+  <link rel="stylesheet" href="/views/assets/users.css" type="text/css">
 </head>
 <body>
-  <% include ../static/partials/messages.ejs %> 
   <% include ../static/partials/navbar.ejs %> 
-  <h1>Wikis</h1>
+  <main class="container">
+    <% include ../static/partials/messages.ejs %> 
+    <h1 class="title">Wiki Index</h1>
+    <div>
+      <ul class="no-bullets border-list">
+        <% wikis.forEach((wiki, index) => { %>
+          <% if (index % 2 === 0) { %>
+            <li class="grey-list list-padding"><a href="/wikis/<%= wiki.id %>"><%= wiki.title %></a></li>
+          <% } else { %>
+            <li class="list-padding"><a href="/wikis/<%= wiki.id %>"><%= wiki.title %></a></li>
+         <% } %>
+        <% }) %>
+      </ul>
+    </div>
+  </main>
   
   <% include ../static/partials/baseScripts.ejs %> 
 </body>

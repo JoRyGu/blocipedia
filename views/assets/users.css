@@ -1,3 +1,7 @@
+body {
+  font-family: serif;
+}
+
 .title {
   border-bottom: 1px solid #333a40;
 }
@@ -25,4 +29,65 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.no-bullets {
+  list-style: none;
+  padding: 0;
+}
+
+.border-list {
+  border: 2px solid black;
+  border-radius: 0.3em;
+}
+
+.list-padding {
+  padding: 0.3em;
+}
+
+.grey-list {
+  background-color: #eee;
+}
+
+a, a:hover, a:visited, a:active {
+  text-decoration: none;
+  color: black;
+}
+
+a:hover {
+  font-weight: bold;
+}
+
+.btn-font {
+  font-family: sans-serif;
+}
+
+.wiki-editor-submit {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.right-margin-form {
+  margin-right: 1.25em;
+}
+
+.right-margin-form-sm {
+  margin-right: 0.5em;
+}
+
+.no-margin {
+  margin: 4px 0 0 0;
+}
+
+#make-public:hover {
+  background-color: red;
+  border: 1px solid black;
+  color: white;
+}
+
+#make-private:hover {
+  background-color: green;
+  border: 1px solid black;
+  color: white;
 }

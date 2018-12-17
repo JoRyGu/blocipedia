@@ -80,7 +80,15 @@
             <textarea name="body" class="form-control" id="editor" placeholder="###### Use Markdown Syntax!" onscroll="SyncScroll('editor')"></textarea>
             <input type="text" style="display:none;" id="hidden-form" name="title">
           </div>
-          <button type="submit" class="btn btn-success">Submit</button>
+          <div class="form-group wiki-editor-submit">
+            <button type="submit" class="btn btn-success right-margin-form btn-font">Submit</button>
+            <% if (user.role === 'premium') { %>
+              <input type="checkbox" class="right-margin-form-sm" value="private" id="private" form="form" name="private">
+              <label for="private" class="no-margin btn-font">Make this wiki private</label>
+            <% } %>
+            
+          </div>
+          
         </form>
       </div>
       <div class="col-md">
